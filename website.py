@@ -36,12 +36,10 @@ class Website:
     #: .. versionadded::3.2.1.0
     #:
     channel = fields.Many2One(
-        'sale.channel', 'Channel', required=True,
-        domain=[
+        'sale.channel', 'Channel', domain=[
             ('create_users', '=', Eval('application_user')),
             ('source', '=', 'webshop'),
-        ],
-        depends=['application_user']
+        ], depends=['application_user']
     )
 
     #: The warehouse to be used in the sale order when an order on this site is
@@ -94,6 +92,7 @@ class Website:
 
         table = TableHandler(cursor, cls, module_name)
 
+        table.not_null_action('channel', action='remove')
         table.not_null_action('warehouse', action='remove')
         table.not_null_action('stock_location', action='remove')
         table.not_null_action('payment_term', action='remove')
@@ -106,6 +105,12 @@ class Website:
             return self.channel.warehouse.storage_location.id
 
         return getattr(self.channel, name).id
+
+    def get_context(self):
+        context = super(Website, self).get_context()
+        if self.channel:
+            context['current_channel'] = self.channel.id
+        return context
 
     @classmethod
     def account_context(cls):
