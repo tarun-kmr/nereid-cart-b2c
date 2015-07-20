@@ -394,7 +394,6 @@ class BaseTestCase(NereidTestCase):
             [self.User(USER)], {
                 'main_company': self.company.id,
                 'company': self.company.id,
-                'current_channel': self.channel,
             }
         )
 
