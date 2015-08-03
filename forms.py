@@ -12,7 +12,7 @@ from wtforms import validators, IntegerField, FloatField
 from nereid.contrib.locale import make_lazy_gettext
 
 _ = make_lazy_gettext('nereid_cart_b2c')
-_VDTR = [validators.Required(message=_("This field is required"))]
+_VDTR = [validators.DataRequired(message=_("This field is required"))]
 
 
 class AddtoCartForm(Form):
