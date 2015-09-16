@@ -74,6 +74,15 @@ class Sale:
 
         return channel_price_list
 
+    @classmethod
+    def copy(cls, sales, default=None):
+        if default is None:
+            default = {}
+        default.setdefault('is_cart', False)
+        default.setdefault('website', None)
+        default.setdefault('nereid_user', None)
+        return super(Sale, cls).copy(sales, default=default)
+
     def refresh_taxes(self):
         '''
         Reload taxes of all sale lines
