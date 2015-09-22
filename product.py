@@ -25,6 +25,7 @@ class Product:
     "Product extension for Nereid"
     __name__ = "product.product"
 
+    # TODO: Move these fields into webshop channel listing
     display_available_quantity = fields.Boolean(
         "Display Available Quantity On Website?"
     )
