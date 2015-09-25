@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from trytond.transaction import Transaction
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields
-from trytond.pyson import Bool, Eval
+from trytond.pyson import Bool, Eval, Not
 from nereid import request, cache, jsonify, abort, current_user, route
 from nereid.helpers import key_from_list
 
@@ -54,6 +54,13 @@ class Product:
     is_backorder = fields.Function(
         fields.Boolean("Is Backorder"), getter="get_is_backorder"
     )
+
+    @classmethod
+    def view_attributes(cls):
+        return super(Product, cls).view_attributes() + [
+            ('//page[@id="inventory_det"]', 'states', {
+                'invisible': Not(Bool(Eval('displayed_on_eshop')))
+            })]
 
     def get_is_backorder(self, name):
         if self.min_warehouse_quantity is None or \
@@ -195,7 +202,7 @@ class Product:
 
         price_list = Sale.default_price_list()
 
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             customer = request.nereid_website.guest_user.party
         else:
             customer = current_user.party
