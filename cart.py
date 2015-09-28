@@ -48,7 +48,7 @@ class Cart(ModelSQL):
 
     @staticmethod
     def default_user():
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             return current_user.id
 
     @staticmethod
