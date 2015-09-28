@@ -64,7 +64,7 @@ class Sale:
 
         # If control reaches here, then this is a nereid request. Lets try
         # and personalise the pricelist of the user logged in.
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             # Sorry anonymous users, you get the shop price
             return channel_price_list
 
@@ -119,13 +119,10 @@ class Sale:
         old_price = Decimal('0.0')
         if order_line:
             old_price = order_line.unit_price
-            values.update({
-                'unit': order_line.unit.id,
-                'quantity': quantity if action == 'set'
-                    else quantity + order_line.quantity,
-            })
+            order_line.unit = order_line.unit.id
+            order_line.quantity = quantity if action == 'set' \
+                else quantity + order_line.quantity
         else:
-            order_line = SaleLine()
             values.update({
                 'sale': self.id,
                 'sequence': 10,
@@ -133,16 +130,17 @@ class Sale:
                 'unit': None,
                 'description': None,
             })
-            values.update(SaleLine(**values).on_change_product())
+            order_line = SaleLine(**values)
+            order_line.on_change_product()
 
-        values.update(SaleLine(**values).on_change_quantity())
+        order_line.on_change_quantity()
 
-        if old_price and old_price != values['unit_price']:
+        if old_price and old_price != order_line.unit_price:
             vals = (
                 product.name, self.currency.symbol, old_price,
-                self.currency.symbol, values['unit_price']
+                self.currency.symbol, order_line.unit_price
             )
-            if old_price < values['unit_price']:
+            if old_price < order_line.unit_price:
                 message = _(
                     "The unit price of product %s increased from %s%d to "
                     "%s%d." % vals
@@ -154,9 +152,6 @@ class Sale:
                 )
             flash(message)
 
-        for key, value in values.iteritems():
-            if '.' not in key:
-                setattr(order_line, key, value)
         return order_line
 
 

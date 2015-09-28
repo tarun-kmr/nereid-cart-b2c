@@ -2,8 +2,7 @@
 <data>
     <xpath expr="/form/notebook/page[@id='ecomm_det']" position="after">
         <!-- TODO: This page should not appear if product is not 'goods' type -->
-        <page string="Inventory Details" id="inventory_det"
-            states="{'invisible': Not(Bool(Eval('displayed_on_eshop')))}">
+        <page string="Inventory Details" id="inventory_det">
             <label name="min_warehouse_quantity"/>
             <field name="min_warehouse_quantity"/>
             <newline/>
