@@ -93,6 +93,39 @@ class TestCart(BaseTestCase):
             )
             self.assertEqual(sale.lines[0].quantity, quantity)
 
+    def test_0015_cart_duplication(self):
+        """
+        duplicating a webshop order from Tryton should not
+        make it a cart order.
+        """
+        quantity = 5
+
+        with Transaction().start(DB_NAME, USER, CONTEXT):
+            self.setup_defaults()
+            app = self.get_app()
+
+            with app.test_client() as c:
+                rv = c.get('/cart')
+                self.assertEqual(rv.status_code, 200)
+
+                c.post(
+                    '/cart/add',
+                    data={
+                        'product': self.product1.id,
+                        'quantity': quantity,
+                    }
+                )
+                rv = c.get('/cart')
+                self.assertEqual(rv.status_code, 200)
+
+            sales = self.Sale.search([])
+            self.assertEqual(len(sales), 1)
+            sale = sales[0]
+
+            # Now duplicate the order
+            new_sale, = self.Sale.copy([sale])
+            self.assertFalse(new_sale.is_cart)
+
     def test_0020_cart_diff_apps(self):
         """
         Call the cart with two different applications
