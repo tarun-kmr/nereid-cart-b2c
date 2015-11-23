@@ -10,8 +10,7 @@
 import unittest
 from decimal import Decimal
 
-from nereid import request
-from nereid.globals import session
+from nereid.globals import session, current_website
 from trytond.tests.test_tryton import USER, DB_NAME, CONTEXT, POOL
 from trytond.transaction import Transaction
 
@@ -471,10 +470,10 @@ class TestCart(BaseTestCase):
                 cart.create_draft_sale()
 
                 self.assertEqual(
-                    cart.sale.party, request.nereid_website.guest_user.party
+                    cart.sale.party, current_website.guest_user.party
                 )
                 self.assertEqual(
-                    cart.sale.nereid_user, request.nereid_website.guest_user
+                    cart.sale.nereid_user, current_website.guest_user
                 )
 
     def test_0110_cart_cache_header(self):

@@ -8,8 +8,8 @@
 from functools import partial
 
 from babel import numbers
-from nereid import render_template, login_required, request, current_user, \
-    route
+from nereid import render_template, login_required, current_user, \
+    route, current_locale
 from nereid.contrib.pagination import Pagination
 from nereid.globals import session
 from trytond import backend
@@ -238,7 +238,7 @@ class Website:
             # Build locale based formatters
             currency_format = partial(
                 numbers.format_currency, currency=cart.sale.currency.code,
-                locale=request.nereid_language.code
+                locale=current_locale.language.code
             )
 
             rv['cart'] = {

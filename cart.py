@@ -11,7 +11,8 @@ from decimal import Decimal
 from functools import partial
 
 from nereid import jsonify, render_template, flash, request, login_required, \
-    url_for, current_user, route, context_processor, abort
+    url_for, current_user, route, context_processor, abort, current_locale, \
+    current_website
 from nereid.contrib.locale import make_lazy_gettext
 from nereid.globals import session, current_app
 from flask.ext.login import user_logged_in
@@ -57,7 +58,7 @@ class Cart(ModelSQL):
 
     @staticmethod
     def default_website():
-        return request.nereid_website.id
+        return current_website.id
 
     @classmethod
     @context_processor('get_cart_size')
@@ -97,10 +98,10 @@ class Cart(ModelSQL):
             # Build locale formatters
             currency_format = partial(
                 numbers.format_currency, currency=cart.sale.currency.code,
-                locale=request.nereid_language.code
+                locale=current_locale.language.code
             )
             number_format = partial(
-                numbers.format_number, locale=request.nereid_language.code
+                numbers.format_number, locale=current_locale.language.code
             )
             return jsonify(cart={
                 'lines': [{
@@ -167,7 +168,7 @@ class Cart(ModelSQL):
         :return: Active record of cart or None
         """
         domain = [
-            ('website', '=', request.nereid_website.id),
+            ('website', '=', current_website.id),
             ('user', '=', user),
         ]
         if not user:
@@ -236,9 +237,9 @@ class Cart(ModelSQL):
                 existing_sale_orders = Sale.search([
                     ('state', '=', 'draft'),
                     ('is_cart', '=', True),
-                    ('website', '=', request.nereid_website.id),
+                    ('website', '=', current_website.id),
                     ('party', '=', user.party.id),
-                    ('currency', '=', request.nereid_currency.id)
+                    ('currency', '=', current_locale.currency.id)
                 ], limit=1)
             if existing_sale_orders:
                 cart.sale = existing_sale_orders[0]
@@ -263,7 +264,7 @@ class Cart(ModelSQL):
         if self.sale.state != 'draft':
             current_app.logger.debug('Sale state is not draft')
             self.sale = None
-        elif self.sale.currency != request.nereid_currency:
+        elif self.sale.currency != current_locale.currency:
             current_app.logger.debug('Sale currency differs from request')
             self.sale = None
         elif user_id and (self.sale.party.id != NereidUser(user_id).party.id):
@@ -294,20 +295,20 @@ class Cart(ModelSQL):
         Sale = Pool().get('sale.sale')
 
         if user is None:
-            user = self.user or request.nereid_website.guest_user
+            user = self.user or current_website.guest_user
         if party is None:
             party = user.party
 
         sale_values = {
             'party': party.id,
-            'currency': request.nereid_currency.id,
-            'company': request.nereid_website.company.id,
+            'currency': current_locale.currency.id,
+            'company': current_website.company.id,
             'is_cart': True,
             'state': 'draft',
-            'website': request.nereid_website.id,
+            'website': current_website.id,
             'nereid_user': user.id,
-            'warehouse': request.nereid_website.warehouse.id,
-            'payment_term': request.nereid_website.payment_term.id,
+            'warehouse': current_website.warehouse.id,
+            'payment_term': current_website.payment_term.id,
         }
         self.sale = Sale.create([sale_values])[0]
         self.save()
