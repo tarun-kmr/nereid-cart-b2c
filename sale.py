@@ -14,7 +14,8 @@ from decimal import Decimal
 from trytond.pool import Pool, PoolMeta
 from trytond.model import fields
 from trytond.transaction import Transaction
-from nereid import current_user, url_for, request, redirect, flash, abort
+from nereid import current_user, url_for, request, redirect, flash, abort, \
+    current_locale
 from nereid.contrib.locale import make_lazy_gettext
 from nereid.ctx import has_request_context
 _ = make_lazy_gettext('nereid_cart_b2c')
@@ -184,10 +185,10 @@ class SaleLine:
         if purpose == 'cart':
             currency_format = partial(
                 numbers.format_currency, currency=self.sale.currency.code,
-                locale=request.nereid_language.code
+                locale=current_locale.language.code
             )
             number_format = partial(
-                numbers.format_number, locale=request.nereid_language.code
+                numbers.format_number, locale=current_locale.language.code
             )
             res.update({
                 'id': self.id,
