@@ -176,7 +176,7 @@ class Product:
         """
         Getter for start_displaying_qty_digits
         """
-        return self.template.default_uom.digits or 2
+        return self.default_uom.digits or 2
 
     def can_buy_from_eshop(self):
         """
