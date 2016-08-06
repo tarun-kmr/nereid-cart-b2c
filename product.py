@@ -16,6 +16,7 @@ from trytond.transaction import Transaction
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields
 from trytond.pyson import Bool, Eval
+from trytond import backend
 from nereid import request, cache, jsonify, abort, current_user, route
 from nereid.helpers import key_from_list
 from nereid.contrib.locale import make_lazy_gettext
@@ -56,8 +57,8 @@ class Product:
         )
     )
 
-    min_warehouse_quantity = fields.Numeric(
-        'Min Warehouse Quantity', digits=(16, 4),
+    min_warehouse_quantity = fields.Float(
+        'Min Warehouse Quantity',
         help="Minimum quantity required in warehouse for orders"
     )
     is_backorder = fields.Function(
@@ -69,6 +70,17 @@ class Product:
                 self.min_warehouse_quantity < 0:
             return True
         return False
+
+    @classmethod
+    def __register__(cls, module_name):
+        TableHandler = backend.get('TableHandler')
+        cursor = Transaction().cursor
+
+        # Change 'min_warehouse_quantity' type to Float
+        table = TableHandler(cursor, cls, module_name)
+        table.alter_type('min_warehouse_quantity', 'float')
+
+        super(Product, cls).__register__(module_name)
 
     @classmethod
     def __setup__(cls):
@@ -169,7 +181,7 @@ class Product:
         By default, min_warehouse_quantity is minus one. This is to handle the
         normal sale order workflow.
         """
-        return -1
+        return -1.0
 
     @fields.depends('_parent_template')
     def on_change_with_start_displaying_qty_digits(self, name=None):
@@ -228,6 +240,10 @@ class Product:
 
         if status == 'in_stock' and self.display_available_quantity and \
                 quantity <= self.start_displaying_available_quantity:
+
+            if self.min_warehouse_quantity > 0:
+                quantity = quantity - self.min_warehouse_quantity
+
             message = '%s %s %s' % (quantity, self.default_uom.name,
                                     str(_('left')))
 
