@@ -333,21 +333,21 @@ class BaseTestCase(NereidTestCase):
         # Create users and assign the pricelists to them
         self.guest_user, = self.NereidUser.create([{
             'party': party1.id,
-            'display_name': 'Guest User',
+            'name': 'Guest User',
             'email': 'guest@openlabs.co.in',
             'password': 'password',
             'company': self.company.id,
         }])
         self.registered_user, = self.NereidUser.create([{
             'party': party2.id,
-            'display_name': 'Registered User',
+            'name': 'Registered User',
             'email': 'email@example.com',
             'password': 'password',
             'company': self.company.id,
         }])
         self.registered_user2, = self.NereidUser.create([{
             'party': party3.id,
-            'display_name': 'Registered User 2',
+            'name': 'Registered User 2',
             'email': 'email2@example.com',
             'password': 'password2',
             'company': self.company.id,
