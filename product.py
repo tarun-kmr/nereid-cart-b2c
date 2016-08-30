@@ -73,14 +73,14 @@ class Product:
 
     @classmethod
     def __register__(cls, module_name):
+        super(Product, cls).__register__(module_name)
+
         TableHandler = backend.get('TableHandler')
         cursor = Transaction().cursor
 
         # Change 'min_warehouse_quantity' type to Float
         table = TableHandler(cursor, cls, module_name)
         table.alter_type('min_warehouse_quantity', 'float')
-
-        super(Product, cls).__register__(module_name)
 
     @classmethod
     def __setup__(cls):
