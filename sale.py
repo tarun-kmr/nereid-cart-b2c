@@ -123,6 +123,7 @@ class Sale:
                 'quantity': quantity,
                 'unit': None,
                 'description': None,
+                'warehouse': self.warehouse
             })
             order_line.on_change_product()
 
