@@ -21,7 +21,7 @@ from babel import numbers
 from nereid.ctx import has_request_context
 
 
-from trytond.model import ModelSQL, fields
+from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool, PoolMeta
 
 from .forms import AddtoCartForm
@@ -31,7 +31,7 @@ __all__ = ['Cart']
 __metaclass__ = PoolMeta
 
 
-class Cart(ModelSQL):
+class Cart(ModelSQL, ModelView):
     """
     Shopping Cart plays the link between a customer's shopping experience
     and the creation of a Sale Order in the backend.
