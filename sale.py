@@ -154,7 +154,10 @@ class SaleLine:
 
     def refresh_taxes(self):
         "Refresh taxes of sale line"
-        self.on_change_product()
+        SaleLine = Pool().get('sale.line')
+
+        updated_sale = SaleLine(self.id).on_change_product()
+        self.taxes = updated_sale.taxes
         self.save()
 
     def serialize(self, purpose=None):
