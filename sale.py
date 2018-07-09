@@ -129,7 +129,8 @@ class Sale:
 
         order_line.on_change_quantity()
 
-        if old_price and old_price != order_line.unit_price:
+        if old_price and old_price != order_line.unit_price and \
+                not order_line.shipment_cost:
             vals = (
                 product.name, self.currency.symbol, old_price,
                 self.currency.symbol, order_line.unit_price
